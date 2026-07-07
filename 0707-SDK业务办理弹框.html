@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SDK业务办理弹框</title>
+  <style>
+    :root {
+      --primary: #1677ff;
+      --primary-dark: #0f5fd1;
+      --primary-soft: #eef6ff;
+      --success: #12b981;
+      --warning: #f59e0b;
+      --text-strong: #111827;
+      --text-main: #1f2937;
+      --text-muted: #667085;
+      --border: #d8e1ee;
+      --border-light: #e7edf5;
+      --page-bg: #f4f7fb;
+      --panel-bg: #ffffff;
+      --shadow: 0 18px 42px rgba(17, 24, 39, 0.14);
+      --radius: 8px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text-main);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 247, 251, 0.96)),
+        var(--page-bg);
+      letter-spacing: 0;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .sdk-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 46px 28px;
+    }
+
+    .host-panel {
+      width: min(520px, 100%);
+      padding: 36px;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 18px 42px rgba(17, 24, 39, 0.08);
+      text-align: center;
+    }
+
+    .launch-btn {
+      min-width: 168px;
+      height: 48px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--primary);
+      color: #fff;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 600;
+      transition: background 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .launch-btn:hover,
+    .launch-btn:focus-visible {
+      background: var(--primary-dark);
+      box-shadow: 0 10px 22px rgba(22, 119, 255, 0.22);
+      outline: none;
+    }
+
+    .entry-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 12;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      background: rgba(15, 23, 42, 0.24);
+      backdrop-filter: blur(3px);
+    }
+
+    .entry-overlay.is-open {
+      display: flex;
+    }
+
+    .entry-modal {
+      width: min(1120px, 96vw);
+      min-height: 500px;
+      max-height: calc(100vh - 56px);
+      overflow: hidden;
+      border: 1px solid #ccd6e2;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      animation: modalIn 0.18s ease-out;
+    }
+
+    .entry-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      min-height: 132px;
+      padding: 0 34px 0 38px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .entry-title-group {
+      min-width: 0;
+    }
+
+    .sdk-title {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 34px;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+
+    .sdk-subtitle {
+      margin: 10px 0 0;
+      color: var(--text-muted);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    .entry-actions {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .entry-body {
+      overflow-y: auto;
+      padding: 40px 38px 44px;
+    }
+
+    .company-badge {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 42px;
+      padding: 0 16px;
+      border: 1px solid var(--border-light);
+      border-radius: 999px;
+      background: #fff;
+      color: #344054;
+      box-shadow: 0 8px 24px rgba(18, 50, 86, 0.06);
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .company-badge svg {
+      width: 18px;
+      height: 18px;
+      color: var(--primary);
+    }
+
+    .business-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .business-card {
+      position: relative;
+      min-height: 210px;
+      display: grid;
+      grid-template-columns: 58px 1fr 34px;
+      align-items: start;
+      gap: 18px;
+      width: 100%;
+      padding: 28px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--panel-bg);
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(18, 50, 86, 0.07);
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    }
+
+    .business-card::after {
+      content: "";
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      bottom: 22px;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(22, 119, 255, 0.22), rgba(18, 185, 129, 0.2), transparent);
+    }
+
+    .business-card:hover,
+    .business-card:focus-visible {
+      transform: translateY(-2px);
+      border-color: #a7c8ff;
+      box-shadow: 0 18px 38px rgba(18, 50, 86, 0.12);
+      outline: none;
+    }
+
+    .business-card h2 {
+      margin: 1px 0 12px;
+      color: var(--text-strong);
+      font-size: 22px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .business-card p {
+      margin: 0;
+      color: #4b5563;
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .option-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 58px;
+      height: 58px;
+      border-radius: var(--radius);
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .option-icon.success {
+      background: #ecfdf5;
+      color: var(--success);
+    }
+
+    .option-icon svg {
+      width: 30px;
+      height: 30px;
+      stroke-width: 2;
+    }
+
+    .option-arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      margin-top: 8px;
+      border: 1px solid var(--border-light);
+      border-radius: 50%;
+      color: #98a2b3;
+      transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .business-card:hover .option-arrow,
+    .business-card:focus-visible .option-arrow {
+      color: var(--primary);
+      border-color: #cfe0ff;
+      background: #f5f9ff;
+    }
+
+    .sdk-footer-note {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 22px;
+      color: #667085;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .sdk-footer-note svg {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      color: var(--warning);
+    }
+
+    .sdk-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      background: rgba(15, 23, 42, 0.28);
+      backdrop-filter: blur(3px);
+    }
+
+    .sdk-overlay.is-open {
+      display: flex;
+    }
+
+    .sdk-modal {
+      width: min(1470px, 96vw);
+      max-height: calc(100vh - 56px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid #ccd6e2;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      animation: modalIn 0.18s ease-out;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.99);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 114px;
+      padding: 0 48px;
+      border-bottom: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .modal-title {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 30px;
+      line-height: 1.3;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: #7a869a;
+      cursor: pointer;
+      transition: color 0.18s ease, background 0.18s ease;
+    }
+
+    .modal-close:hover,
+    .modal-close:focus-visible {
+      color: #344054;
+      background: #f3f6fa;
+      outline: none;
+    }
+
+    .modal-close svg {
+      width: 28px;
+      height: 28px;
+      stroke-width: 2.2;
+    }
+
+    .modal-body {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 42px 45px 36px;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(390px, 0.78fr);
+      gap: 26px;
+      align-items: stretch;
+    }
+
+    .info-panel,
+    .qr-panel {
+      min-height: 648px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .info-panel {
+      padding: 36px 26px 32px;
+    }
+
+    .qr-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 36px 30px 30px;
+      text-align: center;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin: 0 0 26px;
+      color: var(--text-strong);
+      font-size: 27px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .section-heading::before {
+      content: "";
+      width: 5px;
+      height: 25px;
+      border-radius: 999px;
+      background: var(--primary);
+    }
+
+    .section-rule {
+      height: 1px;
+      margin-bottom: 27px;
+      background: #d7e0ec;
+    }
+
+    .info-list {
+      display: grid;
+      gap: 27px;
+      margin: 0 0 40px;
+    }
+
+    .info-row {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 28px;
+      align-items: baseline;
+      min-height: 33px;
+    }
+
+    .info-row dt {
+      color: #111827;
+      font-size: 24px;
+      line-height: 1.35;
+      font-weight: 400;
+    }
+
+    .info-row dd {
+      margin: 0;
+      color: #1f2937;
+      font-size: 24px;
+      line-height: 1.35;
+      font-weight: 400;
+    }
+
+    .business-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .business-tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 12px;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #155eef;
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .tips-box {
+      margin: 0 14px;
+      padding: 22px 24px 21px;
+      border: 1px solid #cfe0ff;
+      border-radius: 8px;
+      background: #fbfdff;
+      text-align: left;
+    }
+
+    .tips-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      color: var(--primary);
+      font-size: 22px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .tips-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .tips-box ul {
+      margin: 0;
+      padding-left: 44px;
+      color: #374151;
+      font-size: 20px;
+      line-height: 2;
+    }
+
+    .qr-title {
+      margin: 0 0 26px;
+      color: var(--text-strong);
+      font-size: 27px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .qr-frame {
+      width: 342px;
+      height: 342px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: #fff;
+    }
+
+    .qr-frame canvas {
+      width: 306px;
+      height: 306px;
+      image-rendering: pixelated;
+    }
+
+    .qr-expire {
+      margin: 30px 0 34px;
+      color: var(--text-strong);
+      font-size: 24px;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .qr-expire span {
+      display: inline-block;
+      min-width: 66px;
+      color: var(--primary);
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+
+    .refresh-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      min-height: 44px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 23px;
+      line-height: 1.3;
+      font-weight: 500;
+      transition: background 0.18s ease, color 0.18s ease;
+    }
+
+    .refresh-btn:hover,
+    .refresh-btn:focus-visible {
+      background: #f0f7ff;
+      color: var(--primary-dark);
+      outline: none;
+    }
+
+    .refresh-btn svg {
+      width: 27px;
+      height: 27px;
+      stroke-width: 2.2;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: center;
+      padding-top: 48px;
+    }
+
+    .ghost-btn {
+      min-width: 152px;
+      height: 58px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #fff;
+      color: #1f2937;
+      cursor: pointer;
+      font-size: 24px;
+      font-weight: 500;
+      transition: border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .ghost-btn:hover,
+    .ghost-btn:focus-visible {
+      border-color: #a7c8ff;
+      background: #f8fbff;
+      outline: none;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    @media (max-width: 1100px) {
+      .sdk-page {
+        padding: 32px 18px;
+      }
+
+      .entry-header {
+        min-height: 112px;
+        padding: 0 24px;
+      }
+
+      .entry-body {
+        padding: 32px 24px 38px;
+      }
+
+      .modal-header {
+        min-height: 88px;
+        padding: 0 28px;
+      }
+
+      .modal-title {
+        font-size: 26px;
+      }
+
+      .modal-body {
+        padding: 30px 24px;
+      }
+
+      .modal-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .info-panel,
+      .qr-panel {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .entry-overlay {
+        padding: 12px;
+      }
+
+      .entry-header {
+        min-height: 118px;
+        align-items: flex-start;
+        padding: 28px 18px 24px;
+      }
+
+      .entry-actions {
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .entry-body {
+        padding: 28px 16px 34px;
+      }
+
+      .company-badge {
+        display: none;
+      }
+
+      .sdk-title {
+        font-size: 28px;
+      }
+
+      .business-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .business-card {
+        grid-template-columns: 52px 1fr;
+        min-height: 188px;
+        padding: 26px 22px;
+      }
+
+      .option-icon {
+        width: 52px;
+        height: 52px;
+      }
+
+      .option-arrow {
+        display: none;
+      }
+
+      .sdk-overlay {
+        padding: 12px;
+      }
+
+      .modal-header {
+        padding: 0 18px 0 20px;
+      }
+
+      .modal-title {
+        font-size: 23px;
+      }
+
+      .modal-body {
+        padding: 20px 14px 24px;
+      }
+
+      .info-panel,
+      .qr-panel {
+        border-radius: 10px;
+        padding: 22px 16px;
+      }
+
+      .section-heading,
+      .qr-title {
+        font-size: 22px;
+      }
+
+      .info-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .info-row dt,
+      .info-row dd {
+        font-size: 19px;
+      }
+
+      .tips-box {
+        margin: 0;
+        padding: 18px;
+      }
+
+      .tips-title {
+        font-size: 19px;
+      }
+
+      .tips-box ul {
+        padding-left: 24px;
+        font-size: 17px;
+      }
+
+      .qr-frame {
+        width: min(310px, 100%);
+        height: auto;
+        aspect-ratio: 1;
+      }
+
+      .qr-frame canvas {
+        width: 88%;
+        height: 88%;
+      }
+
+      .qr-expire,
+      .refresh-btn,
+      .ghost-btn {
+        font-size: 20px;
+      }
+    }
+
+    @media (max-height: 920px) and (min-width: 1101px) {
+      .sdk-modal {
+        max-height: calc(100vh - 48px);
+      }
+
+      .modal-header {
+        min-height: 96px;
+      }
+
+      .modal-body {
+        padding: 28px 42px 24px;
+      }
+
+      .info-panel,
+      .qr-panel {
+        min-height: 0;
+        padding: 30px 26px 26px;
+      }
+
+      .section-heading,
+      .qr-title {
+        margin-bottom: 20px;
+        font-size: 25px;
+      }
+
+      .section-rule {
+        margin-bottom: 22px;
+      }
+
+      .info-list {
+        gap: 20px;
+        margin-bottom: 26px;
+      }
+
+      .info-row {
+        min-height: 28px;
+      }
+
+      .info-row dt,
+      .info-row dd {
+        font-size: 22px;
+      }
+
+      .tips-box {
+        margin: 0 10px;
+        padding: 18px 22px;
+      }
+
+      .tips-title {
+        margin-bottom: 8px;
+        font-size: 20px;
+      }
+
+      .tips-box ul {
+        font-size: 18px;
+        line-height: 1.75;
+      }
+
+      .qr-frame {
+        width: 300px;
+        height: 300px;
+      }
+
+      .qr-frame canvas {
+        width: 270px;
+        height: 270px;
+      }
+
+      .qr-expire {
+        margin: 24px 0;
+        font-size: 22px;
+      }
+
+      .refresh-btn {
+        font-size: 21px;
+      }
+
+      .modal-actions {
+        padding-top: 24px;
+      }
+
+      .ghost-btn {
+        height: 52px;
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="sdk-page">
+    <div class="host-panel">
+      <button class="launch-btn" type="button" id="launchEntry">业务办理</button>
+    </div>
+  </main>
+
+  <div class="entry-overlay is-open" id="entryOverlay" role="dialog" aria-modal="true" aria-labelledby="entryTitle">
+    <div class="entry-modal">
+      <header class="entry-header">
+        <div class="entry-title-group">
+          <h1 class="sdk-title" id="entryTitle">业务办理</h1>
+        </div>
+        <div class="entry-actions">
+          <div class="company-badge" aria-label="当前企业">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 21V6.5C4 5.12 5.12 4 6.5 4h6C13.88 4 15 5.12 15 6.5V21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M15 9h2.5c1.38 0 2.5 1.12 2.5 2.5V21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 8h3M8 12h3M8 16h3M3 21h18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            成都房联云码
+          </div>
+          <button class="modal-close" type="button" id="entryClose" aria-label="关闭">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="entry-body">
+        <section class="business-grid" aria-label="业务类型">
+        <button class="business-card" type="button" data-business="cert">
+          <span class="option-icon success" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7 10.5V7a5 5 0 0 1 10 0v3.5" stroke="currentColor" stroke-linecap="round"/>
+              <path d="M6.5 10.5h11A2.5 2.5 0 0 1 20 13v5.5a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18.5V13a2.5 2.5 0 0 1 2.5-2.5Z" stroke="currentColor" stroke-linejoin="round"/>
+              <path d="M12 15v2.5" stroke="currentColor" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span>
+            <h2>云印章（证书）管理</h2>
+            <p>修改PIN码、续期、变更</p>
+          </span>
+          <span class="option-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </button>
+
+        <button class="business-card" type="button" data-business="seal">
+          <span class="option-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M8.5 11.5h7l1.3 6H7.2l1.3-6Z" stroke="currentColor" stroke-linejoin="round"/>
+              <path d="M10 11.5V8a2 2 0 1 1 4 0v3.5" stroke="currentColor" stroke-linecap="round"/>
+              <path d="M5 20h14" stroke="currentColor" stroke-linecap="round"/>
+              <path d="M8 4.5c.9-1 2.25-1.5 4-1.5s3.1.5 4 1.5" stroke="currentColor" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span>
+            <h2>申请企业印章（证书）</h2>
+            <p>扫码办理云印章（证书）申请</p>
+          </span>
+          <span class="option-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </button>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="sdk-overlay" id="sdkOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="sdk-modal">
+      <header class="modal-header">
+        <h2 class="modal-title" id="modalTitle">申请企业印章（证书）</h2>
+        <button class="modal-close" type="button" id="topClose" aria-label="关闭">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </header>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <section class="info-panel">
+            <h3 class="section-heading" id="infoHeading">企业信息</h3>
+            <div class="section-rule"></div>
+            <dl class="info-list" id="infoList"></dl>
+            <div class="tips-box">
+              <div class="tips-title">
+                <span class="tips-icon">i</span>
+                温馨提示
+              </div>
+              <ul id="tipsList"></ul>
+            </div>
+          </section>
+
+          <section class="qr-panel">
+            <h3 class="qr-title" id="qrTitle">扫码办理云印章（证书）</h3>
+            <div class="qr-frame">
+              <canvas id="qrCanvas" width="306" height="306" aria-label="业务办理二维码"></canvas>
+            </div>
+            <div class="qr-expire">二维码有效期： <span id="timerText">09:55</span></div>
+            <button class="refresh-btn" type="button" id="refreshBtn">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20 12a8 8 0 1 1-2.34-5.66" stroke="currentColor" stroke-linecap="round"/>
+                <path d="M20 4v5h-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              刷新二维码
+            </button>
+          </section>
+        </div>
+
+        <div class="modal-actions">
+          <button class="ghost-btn" type="button" id="bottomClose">关闭</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const businessConfig = {
+      cert: {
+        title: "云印章（证书）管理",
+        infoHeading: "业务信息",
+        qrTitle: "扫码管理云印章（证书）",
+        seed: "cloud-certificate-manage",
+        rows: [
+          ["企业名称", "成都房联云码"],
+          ["统一社会信用代码", "91510100MA61Y5PR1Q"],
+          ["法定代表人", "张三"],
+          ["管理事项", ["修改PIN码", "证书续期", "信息变更"]]
+        ],
+        tips: [
+          "请使用法定代表人或经办人微信扫描右侧二维码进入手机端云印章（证书）管理；",
+          "手机端可完成修改PIN码、续期、变更等操作；",
+          "办理结果将自动同步到业务系统，请耐心等待。"
+        ]
+      },
+      seal: {
+        title: "申请企业印章（证书）",
+        infoHeading: "企业信息",
+        qrTitle: "扫码办理云印章（证书）",
+        seed: "enterprise-seal-apply",
+        rows: [
+          ["企业名称", "成都房联云码"],
+          ["统一社会信用代码", "91510100MA61Y5PR1Q"],
+          ["法定代表人", "张三"]
+        ],
+        tips: [
+          "请使用法定代表人或经办人微信扫描右侧二维码办理云印章（证书）；",
+          "办理过程中需完成实名认证、人脸识别等操作；",
+          "办理结果将自动同步到业务系统，请耐心等待。"
+        ]
+      }
+    };
+
+    const entryOverlay = document.getElementById("entryOverlay");
+    const overlay = document.getElementById("sdkOverlay");
+    const modalTitle = document.getElementById("modalTitle");
+    const infoHeading = document.getElementById("infoHeading");
+    const qrTitle = document.getElementById("qrTitle");
+    const infoList = document.getElementById("infoList");
+    const tipsList = document.getElementById("tipsList");
+    const timerText = document.getElementById("timerText");
+    const qrCanvas = document.getElementById("qrCanvas");
+    const refreshBtn = document.getElementById("refreshBtn");
+    let activeBusiness = "seal";
+    let remainingSeconds = 595;
+    let timerId = null;
+    let refreshIndex = 0;
+
+    function openEntry() {
+      entryOverlay.classList.add("is-open");
+      document.body.classList.add("modal-open");
+    }
+
+    function closeEntry() {
+      entryOverlay.classList.remove("is-open");
+      if (!overlay.classList.contains("is-open")) {
+        document.body.classList.remove("modal-open");
+      }
+    }
+
+    function createInfoRows(rows) {
+      infoList.innerHTML = "";
+      rows.forEach(([label, value]) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "info-row";
+
+        const term = document.createElement("dt");
+        term.textContent = label;
+        wrapper.appendChild(term);
+
+        const detail = document.createElement("dd");
+        if (Array.isArray(value)) {
+          const tags = document.createElement("div");
+          tags.className = "business-tags";
+          value.forEach((item) => {
+            const tag = document.createElement("span");
+            tag.className = "business-tag";
+            tag.textContent = item;
+            tags.appendChild(tag);
+          });
+          detail.appendChild(tags);
+        } else {
+          detail.textContent = value;
+        }
+        wrapper.appendChild(detail);
+        infoList.appendChild(wrapper);
+      });
+    }
+
+    function createTips(tips) {
+      tipsList.innerHTML = "";
+      tips.forEach((tip) => {
+        const item = document.createElement("li");
+        item.textContent = tip;
+        tipsList.appendChild(item);
+      });
+    }
+
+    function hashSeed(seed) {
+      let hash = 2166136261;
+      for (let i = 0; i < seed.length; i += 1) {
+        hash ^= seed.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+      }
+      return hash >>> 0;
+    }
+
+    function nextRandom(state) {
+      let value = state.value;
+      value ^= value << 13;
+      value ^= value >>> 17;
+      value ^= value << 5;
+      state.value = value >>> 0;
+      return state.value / 4294967296;
+    }
+
+    function isFinderArea(row, col, size) {
+      const inTop = row < 7;
+      const inLeft = col < 7;
+      const inRight = col >= size - 7;
+      const inBottom = row >= size - 7;
+      return (inTop && inLeft) || (inTop && inRight) || (inBottom && inLeft);
+    }
+
+    function drawFinder(ctx, x, y, cell) {
+      ctx.fillStyle = "#000";
+      ctx.fillRect(x, y, cell * 7, cell * 7);
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(x + cell, y + cell, cell * 5, cell * 5);
+      ctx.fillStyle = "#000";
+      ctx.fillRect(x + cell * 2, y + cell * 2, cell * 3, cell * 3);
+    }
+
+    function drawQr(seed) {
+      const ctx = qrCanvas.getContext("2d");
+      const width = qrCanvas.width;
+      const size = 31;
+      const quiet = 3;
+      const cell = Math.floor(width / (size + quiet * 2));
+      const offset = Math.floor((width - cell * (size + quiet * 2)) / 2) + quiet * cell;
+      const state = { value: hashSeed(seed) || 1 };
+
+      ctx.clearRect(0, 0, width, width);
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, width, width);
+      ctx.fillStyle = "#000";
+
+      for (let row = 0; row < size; row += 1) {
+        for (let col = 0; col < size; col += 1) {
+          if (isFinderArea(row, col, size)) continue;
+          const timing = row === 6 || col === 6;
+          const diagonal = (row + col + state.value) % 9 === 0;
+          const density = nextRandom(state) > 0.58;
+          if ((timing && (row + col) % 2 === 0) || diagonal || density) {
+            ctx.fillRect(offset + col * cell, offset + row * cell, cell, cell);
+          }
+        }
+      }
+
+      drawFinder(ctx, offset, offset, cell);
+      drawFinder(ctx, offset + (size - 7) * cell, offset, cell);
+      drawFinder(ctx, offset, offset + (size - 7) * cell, cell);
+    }
+
+    function formatTime(seconds) {
+      const minutes = String(Math.floor(seconds / 60)).padStart(2, "0");
+      const rest = String(seconds % 60).padStart(2, "0");
+      return `${minutes}:${rest}`;
+    }
+
+    function startTimer() {
+      clearInterval(timerId);
+      remainingSeconds = 595;
+      timerText.textContent = formatTime(remainingSeconds);
+      timerId = setInterval(() => {
+        remainingSeconds = Math.max(0, remainingSeconds - 1);
+        timerText.textContent = formatTime(remainingSeconds);
+        if (remainingSeconds === 0) {
+          clearInterval(timerId);
+        }
+      }, 1000);
+    }
+
+    function openModal(type) {
+      const config = businessConfig[type];
+      activeBusiness = type;
+      closeEntry();
+      modalTitle.textContent = config.title;
+      infoHeading.textContent = config.infoHeading;
+      qrTitle.textContent = config.qrTitle;
+      createInfoRows(config.rows);
+      createTips(config.tips);
+      drawQr(`${config.seed}-${refreshIndex}`);
+      startTimer();
+      overlay.classList.add("is-open");
+      document.body.classList.add("modal-open");
+    }
+
+    function closeModal() {
+      overlay.classList.remove("is-open");
+      clearInterval(timerId);
+      openEntry();
+    }
+
+    document.querySelectorAll("[data-business]").forEach((button) => {
+      button.addEventListener("click", () => {
+        openModal(button.dataset.business);
+      });
+    });
+
+    document.getElementById("launchEntry").addEventListener("click", openEntry);
+    document.getElementById("entryClose").addEventListener("click", closeEntry);
+
+    refreshBtn.addEventListener("click", () => {
+      refreshIndex += 1;
+      drawQr(`${businessConfig[activeBusiness].seed}-${refreshIndex}`);
+      startTimer();
+    });
+
+    document.getElementById("topClose").addEventListener("click", closeModal);
+    document.getElementById("bottomClose").addEventListener("click", closeModal);
+
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay) {
+        closeModal();
+      }
+    });
+
+    entryOverlay.addEventListener("click", (event) => {
+      if (event.target === entryOverlay) {
+        closeEntry();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && overlay.classList.contains("is-open")) {
+        closeModal();
+      } else if (event.key === "Escape" && entryOverlay.classList.contains("is-open")) {
+        closeEntry();
+      }
+    });
+
+    const presetBusiness = new URLSearchParams(window.location.search).get("business");
+    if (businessConfig[presetBusiness]) {
+      window.setTimeout(() => openModal(presetBusiness), 80);
+    } else {
+      openEntry();
+    }
+  </script>
+</body>
+</html>
