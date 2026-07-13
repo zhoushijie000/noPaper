@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>签章SDK弹框</title>
+  <style>
+    :root {
+      --primary: #0f66ff;
+      --primary-dark: #0754e5;
+      --primary-soft: #eef6ff;
+      --text-strong: #111827;
+      --text-main: #1f2937;
+      --text-muted: #4b5563;
+      --border: #d8e1ee;
+      --border-blue: #c9ddff;
+      --panel-bg: #ffffff;
+      --shadow: 0 22px 54px rgba(17, 24, 39, 0.16);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 52px 28px;
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.9), rgba(231, 236, 243, 0.9) 45%, rgba(209, 216, 226, 0.95) 100%),
+        #e5e9f0;
+      letter-spacing: 0;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .sdk-modal {
+      width: min(1258px, 100%);
+      overflow: hidden;
+      border: 1px solid #d5dde8;
+      border-radius: 16px;
+      background: var(--panel-bg);
+      box-shadow: var(--shadow);
+    }
+
+    .modal-header {
+      min-height: 106px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 44px;
+      border-bottom: 1px solid #d6dee9;
+      background: #fff;
+    }
+
+    .modal-title {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 30px;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: #7a869a;
+      cursor: pointer;
+      transition: color 0.18s ease, background 0.18s ease;
+    }
+
+    .icon-btn:hover,
+    .icon-btn:focus-visible {
+      color: #344054;
+      background: #f3f6fa;
+      outline: none;
+    }
+
+    .icon-btn svg {
+      width: 30px;
+      height: 30px;
+      stroke-width: 2.2;
+    }
+
+    .modal-body {
+      padding: 30px 42px 42px;
+    }
+
+    .contract-strip {
+      min-height: 86px;
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      align-items: center;
+      gap: 28px;
+      padding: 0 28px;
+      border: 1px solid var(--border-blue);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fbfdff, #f8fbff);
+    }
+
+    .contract-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 18px;
+      min-width: 0;
+      color: var(--text-main);
+      font-size: 22px;
+      line-height: 1.4;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .contract-item svg {
+      width: 26px;
+      height: 26px;
+      flex: 0 0 auto;
+      color: var(--primary);
+      stroke-width: 2;
+    }
+
+    .section-title {
+      margin: 34px 0 22px;
+      color: var(--text-strong);
+      font-size: 30px;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px;
+    }
+
+    .method-card {
+      position: relative;
+      min-height: 284px;
+      display: grid;
+      grid-template-columns: 178px 1fr;
+      align-items: center;
+      gap: 24px;
+      width: 100%;
+      padding: 30px 34px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    }
+
+    .method-card:hover,
+    .method-card:focus-visible {
+      transform: translateY(-1px);
+      border-color: #9bc1ff;
+      box-shadow: 0 14px 28px rgba(15, 102, 255, 0.09);
+      outline: none;
+    }
+
+    .method-card.is-active {
+      border: 2px solid var(--primary);
+      box-shadow: 0 14px 30px rgba(15, 102, 255, 0.1);
+    }
+
+    .method-card h3 {
+      margin: 0 0 22px;
+      color: var(--text-strong);
+      font-size: 30px;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+
+    .method-card p {
+      margin: 0;
+      color: var(--text-main);
+      font-size: 20px;
+      line-height: 1.85;
+      font-weight: 500;
+    }
+
+    .check-badge {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 36px;
+      height: 36px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .method-card.is-active .check-badge {
+      display: inline-flex;
+    }
+
+    .check-badge svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2.7;
+    }
+
+    .method-graphic {
+      width: 172px;
+      height: 146px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .method-graphic svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .tips-box {
+      margin-top: 42px;
+      min-height: 184px;
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 18px;
+      padding: 24px 28px;
+      border: 1px solid var(--border-blue);
+      border-radius: 8px;
+      background: #fbfdff;
+    }
+
+    .tips-icon {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .tips-title {
+      margin: 0 0 10px;
+      color: var(--text-strong);
+      font-size: 22px;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .tips-list {
+      margin: 0;
+      padding-left: 22px;
+      color: var(--text-main);
+      font-size: 18px;
+      line-height: 1.9;
+      font-weight: 500;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 26px;
+      padding-top: 34px;
+    }
+
+    .action-btn {
+      min-width: 166px;
+      height: 64px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 24px;
+      line-height: 1.2;
+      font-weight: 600;
+      transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .action-btn.secondary {
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: var(--text-strong);
+    }
+
+    .action-btn.secondary:hover,
+    .action-btn.secondary:focus-visible {
+      border-color: #9bc1ff;
+      background: #f8fbff;
+      outline: none;
+    }
+
+    .action-btn.primary {
+      border: 1px solid var(--primary);
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(15, 102, 255, 0.22);
+    }
+
+    .action-btn.primary:hover,
+    .action-btn.primary:focus-visible {
+      background: var(--primary-dark);
+      border-color: var(--primary-dark);
+      outline: none;
+    }
+
+    .status-line {
+      min-height: 24px;
+      margin-right: auto;
+      color: var(--primary);
+      font-size: 16px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+    }
+
+    .status-line.is-visible {
+      opacity: 1;
+    }
+
+    @media (max-width: 980px) {
+      body {
+        padding: 24px 14px;
+      }
+
+      .modal-header {
+        min-height: 86px;
+        padding: 0 24px;
+      }
+
+      .modal-title {
+        font-size: 26px;
+      }
+
+      .modal-body {
+        padding: 24px;
+      }
+
+      .contract-strip {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 18px 22px;
+      }
+
+      .contract-item {
+        white-space: normal;
+        font-size: 19px;
+      }
+
+      .method-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .method-card {
+        min-height: 230px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .modal-body {
+        padding: 20px 16px 24px;
+      }
+
+      .section-title {
+        margin-top: 28px;
+        font-size: 25px;
+      }
+
+      .method-card {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 24px;
+      }
+
+      .method-graphic {
+        width: 138px;
+        height: 112px;
+        justify-content: flex-start;
+      }
+
+      .method-card h3 {
+        font-size: 25px;
+      }
+
+      .method-card p {
+        font-size: 18px;
+      }
+
+      .tips-box {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 28px;
+        padding: 20px;
+      }
+
+      .tips-list {
+        font-size: 16px;
+      }
+
+      .modal-actions {
+        gap: 14px;
+      }
+
+      .action-btn {
+        min-width: 122px;
+        height: 52px;
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="sdk-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <header class="modal-header">
+      <h1 class="modal-title" id="modalTitle">合同签署</h1>
+      <button class="icon-btn" type="button" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <main class="modal-body">
+      <div class="contract-strip" aria-label="合同信息">
+        <div class="contract-item">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M7 3h7l4 4v14H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-linejoin="round"/>
+            <path d="M14 3v5h5M8 12h8M8 16h8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>合同号： HT20260703-001</span>
+        </div>
+        <div class="contract-item">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 21V7.5C4 6.12 5.12 5 6.5 5h5C12.88 5 14 6.12 14 7.5V21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 10h3.5c1.38 0 2.5 1.12 2.5 2.5V21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7 9h3M7 13h3M7 17h3M3 21h18" stroke="currentColor" stroke-linecap="round"/>
+          </svg>
+          <span>签署企业： 房联云码</span>
+        </div>
+      </div>
+
+      <h2 class="section-title">请选择签署方式</h2>
+
+      <div class="method-grid" role="radiogroup" aria-label="签署方式">
+        <button class="method-card is-active" type="button" role="radio" aria-checked="true" data-method="cloud">
+          <span class="check-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="m5 12.5 4.4 4.4L19 7.3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="method-graphic" aria-hidden="true">
+            <svg viewBox="0 0 190 150" fill="none">
+              <defs>
+                <linearGradient id="cloudMain" x1="39" y1="36" x2="143" y2="126" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#eaf4ff"/>
+                  <stop offset="0.55" stop-color="#8fbfff"/>
+                  <stop offset="1" stop-color="#236ff1"/>
+                </linearGradient>
+                <linearGradient id="cloudShade" x1="74" y1="58" x2="118" y2="113" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#ffffff"/>
+                  <stop offset="1" stop-color="#d9eaff"/>
+                </linearGradient>
+                <filter id="softShadow" x="0" y="0" width="190" height="150" filterUnits="userSpaceOnUse">
+                  <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#0f66ff" flood-opacity="0.22"/>
+                </filter>
+              </defs>
+              <path filter="url(#softShadow)" d="M49.2 112.8h93.3c20 0 35.7-14.9 35.7-33.2 0-18.2-15.7-32.8-35.3-32.8-2.5 0-5 .25-7.2.8C127.8 26.7 106.8 12 82.2 12 52.9 12 28.9 33.4 27 60.4 12.4 64.8 2.2 77.4 2.2 92.2c0 18.4 15.6 20.6 47 20.6Z" fill="url(#cloudMain)"/>
+              <path d="M35.5 105.4c-16.4-1-28-9.3-28-22.1 0-13.6 10.9-24.7 25.8-27.3C39.2 34 59.4 18 83.8 18c22.9 0 42.2 14 49.8 33.6" stroke="#1f6ff2" stroke-width="2.2" stroke-linecap="round" opacity="0.72"/>
+              <rect x="68" y="63" width="78" height="58" rx="8" fill="url(#cloudShade)" stroke="#b8d2f7" stroke-width="1.5"/>
+              <path d="M84 80h42M84 95h34M84 110h27" stroke="#95bbef" stroke-width="5" stroke-linecap="round"/>
+              <path d="M139 97c7.3 0 13.2 5.6 13.2 12.5 0 3.7-1.7 7.1-4.5 9.4l2.2 14.2-10.9-6.8-10.9 6.8 2.1-14.2a12.1 12.1 0 0 1-4.4-9.4c0-6.9 5.9-12.5 13.2-12.5Z" fill="#ff6b5f"/>
+              <circle cx="139" cy="109.4" r="7.4" fill="#fff4f1" opacity="0.9"/>
+            </svg>
+          </span>
+          <span>
+            <h3>云签章签署</h3>
+            <p>适用于已开通云印章（云证书）的企业，<br>可在线完成签署</p>
+          </span>
+        </button>
+
+        <button class="method-card" type="button" role="radio" aria-checked="false" data-method="ukey">
+          <span class="check-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="m5 12.5 4.4 4.4L19 7.3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="method-graphic" aria-hidden="true">
+            <svg viewBox="0 0 190 150" fill="none">
+              <defs>
+                <linearGradient id="ukeyBody" x1="28" y1="120" x2="116" y2="42" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#174da8"/>
+                  <stop offset="0.45" stop-color="#2d8bff"/>
+                  <stop offset="1" stop-color="#0b4ec8"/>
+                </linearGradient>
+                <linearGradient id="usbMetal" x1="104" y1="18" x2="152" y2="62" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#e2e8f0"/>
+                  <stop offset="1" stop-color="#9aa7b7"/>
+                </linearGradient>
+                <filter id="ukeyShadow" x="0" y="0" width="190" height="150" filterUnits="userSpaceOnUse">
+                  <feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="#1f2937" flood-opacity="0.22"/>
+                </filter>
+              </defs>
+              <ellipse cx="83" cy="122" rx="58" ry="9" fill="#d5dde8"/>
+              <g filter="url(#ukeyShadow)" transform="rotate(-42 95 74)">
+                <rect x="50" y="50" width="86" height="44" rx="22" fill="url(#ukeyBody)" stroke="#0c4eb6" stroke-width="2"/>
+                <rect x="126" y="56" width="48" height="32" rx="3" fill="url(#usbMetal)" stroke="#7f8a99" stroke-width="1.5"/>
+                <rect x="139" y="62" width="8" height="8" rx="1" fill="#64748b"/>
+                <rect x="155" y="62" width="8" height="8" rx="1" fill="#64748b"/>
+                <path d="M78 61v22M68 72h20" stroke="#dceeff" stroke-width="3" stroke-linecap="round"/>
+                <text x="96" y="80" transform="rotate(90 96 80)" fill="#fff" font-size="18" font-weight="700" font-family="Arial, sans-serif">UKEY</text>
+                <circle cx="65" cy="72" r="4" fill="#0d3886"/>
+              </g>
+            </svg>
+          </span>
+          <span>
+            <h3>UKey签署</h3>
+            <p>适用于使用UKey设备的企业，<br>需插入UKey后完成签署</p>
+          </span>
+        </button>
+      </div>
+
+      <section class="tips-box" aria-label="温馨提示">
+        <span class="tips-icon">i</span>
+        <div>
+          <h3 class="tips-title">温馨提示</h3>
+          <ul class="tips-list">
+            <li>请选择适合当前企业的签署方式；</li>
+            <li>选择后将自动跳转至对应签署页面；</li>
+            <li>如当前企业无权参与本次签署，系统将提示无法签署。</li>
+          </ul>
+        </div>
+      </section>
+
+      <footer class="modal-actions">
+        <div class="status-line" id="statusLine" aria-live="polite"></div>
+        <button class="action-btn primary" type="button" id="nextBtn">确定</button>
+      </footer>
+    </main>
+  </section>
+
+  <script>
+    const methodCards = document.querySelectorAll(".method-card");
+    const statusLine = document.getElementById("statusLine");
+    const nextBtn = document.getElementById("nextBtn");
+
+    methodCards.forEach((card) => {
+      card.addEventListener("click", () => {
+        methodCards.forEach((item) => {
+          item.classList.remove("is-active");
+          item.setAttribute("aria-checked", "false");
+        });
+        card.classList.add("is-active");
+        card.setAttribute("aria-checked", "true");
+        statusLine.classList.remove("is-visible");
+      });
+    });
+
+    nextBtn.addEventListener("click", () => {
+      const active = document.querySelector(".method-card.is-active");
+      const methodName = active?.querySelector("h3")?.textContent || "签署方式";
+      statusLine.textContent = `已选择：${methodName}`;
+      statusLine.classList.add("is-visible");
+    });
+  </script>
+</body>
+</html>

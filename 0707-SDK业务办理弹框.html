@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SDK业务办理弹框</title>
+  <title>SDK业务办理</title>
   <style>
     :root {
       --primary: #1677ff;
@@ -43,10 +43,48 @@
 
     .sdk-page {
       min-height: 100vh;
+      padding: 36px 28px 42px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 247, 251, 0.98)),
+        var(--page-bg);
+    }
+
+    .sdk-page.is-hidden {
+      display: none;
+    }
+
+    .entry-page-shell {
+      width: min(1470px, 100%);
+      margin: 0 auto;
+    }
+
+    .entry-page-header {
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 46px 28px;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .entry-page-title {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 34px;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+
+    .entry-page-body {
+      min-height: 520px;
+      padding: 42px 45px 48px;
+      border: 1px solid #ccd6e2;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 18px 42px rgba(17, 24, 39, 0.08);
+    }
+
+    .entry-page-body .business-card {
+      min-height: 240px;
     }
 
     .host-panel {
@@ -76,6 +114,91 @@
     .launch-btn:focus-visible {
       background: var(--primary-dark);
       box-shadow: 0 10px 22px rgba(22, 119, 255, 0.22);
+      outline: none;
+    }
+
+    .seal-full-page {
+      min-height: 100vh;
+      padding: 36px 28px 42px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 247, 251, 0.98)),
+        var(--page-bg);
+    }
+
+    .seal-page-shell {
+      width: min(1470px, 100%);
+      margin: 0 auto;
+    }
+
+    .seal-page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .seal-page-title-group {
+      min-width: 0;
+    }
+
+    .seal-page-title {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 34px;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+
+    .seal-page-company {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      min-height: 38px;
+      padding: 0 15px;
+      border: 1px solid var(--border-light);
+      border-radius: 999px;
+      background: #fff;
+      color: #344054;
+      font-size: 15px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(18, 50, 86, 0.06);
+    }
+
+    .seal-page-company svg {
+      width: 18px;
+      height: 18px;
+      color: var(--primary);
+      stroke-width: 2;
+    }
+
+    .seal-page-body {
+      padding: 42px 45px 36px;
+      border: 1px solid #ccd6e2;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 18px 42px rgba(17, 24, 39, 0.08);
+    }
+
+    .back-btn {
+      min-width: 146px;
+      height: 48px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #fff;
+      color: #1f2937;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 500;
+      transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+    }
+
+    .back-btn:hover,
+    .back-btn:focus-visible {
+      border-color: #a7c8ff;
+      background: #f8fbff;
+      color: var(--primary);
       outline: none;
     }
 
@@ -623,7 +746,28 @@
 
     @media (max-width: 1100px) {
       .sdk-page {
-        padding: 32px 18px;
+        padding: 28px 18px 34px;
+      }
+
+      .entry-page-header {
+        align-items: flex-start;
+      }
+
+      .entry-page-body {
+        min-height: auto;
+        padding: 30px 24px;
+      }
+
+      .seal-full-page {
+        padding: 28px 18px 34px;
+      }
+
+      .seal-page-header {
+        align-items: flex-start;
+      }
+
+      .seal-page-body {
+        padding: 30px 24px;
       }
 
       .entry-header {
@@ -663,6 +807,56 @@
         padding: 12px;
       }
 
+      .sdk-page {
+        padding: 22px 12px 28px;
+      }
+
+      .entry-page-header {
+        display: block;
+        margin-bottom: 18px;
+      }
+
+      .entry-page-title {
+        font-size: 28px;
+      }
+
+      .entry-page-header .company-badge {
+        display: inline-flex;
+        margin-top: 10px;
+      }
+
+      .entry-page-body {
+        min-height: auto;
+        padding: 20px 14px 24px;
+        border-radius: 10px;
+      }
+
+      .seal-full-page {
+        padding: 22px 12px 28px;
+      }
+
+      .seal-page-header {
+        display: block;
+        margin-bottom: 18px;
+      }
+
+      .seal-page-title {
+        font-size: 28px;
+      }
+
+      .seal-page-company {
+        margin-top: 10px;
+      }
+
+      .seal-page-header .back-btn {
+        margin-top: 16px;
+      }
+
+      .seal-page-body {
+        padding: 20px 14px 24px;
+        border-radius: 10px;
+      }
+
       .entry-header {
         min-height: 118px;
         align-items: flex-start;
@@ -678,7 +872,7 @@
         padding: 28px 16px 34px;
       }
 
-      .company-badge {
+      .entry-actions .company-badge {
         display: none;
       }
 
@@ -863,13 +1057,120 @@
   </style>
 </head>
 <body>
-  <main class="sdk-page">
-    <div class="host-panel">
-      <button class="launch-btn" type="button" id="launchEntry">业务办理</button>
+  <main class="sdk-page" id="hostPage">
+    <div class="entry-page-shell">
+      <header class="entry-page-header">
+        <div>
+          <h1 class="entry-page-title">业务办理</h1>
+          <div class="company-badge" aria-label="当前企业">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 21V6.5C4 5.12 5.12 4 6.5 4h6C13.88 4 15 5.12 15 6.5V21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M15 9h2.5c1.38 0 2.5 1.12 2.5 2.5V21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 8h3M8 12h3M8 16h3M3 21h18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            成都房联云码
+          </div>
+        </div>
+      </header>
+
+      <div class="entry-page-body">
+        <section class="business-grid" aria-label="业务类型">
+          <button class="business-card" type="button" data-business="cert">
+            <span class="option-icon success" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M7 10.5V7a5 5 0 0 1 10 0v3.5" stroke="currentColor" stroke-linecap="round"/>
+                <path d="M6.5 10.5h11A2.5 2.5 0 0 1 20 13v5.5a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18.5V13a2.5 2.5 0 0 1 2.5-2.5Z" stroke="currentColor" stroke-linejoin="round"/>
+                <path d="M12 15v2.5" stroke="currentColor" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span>
+              <h2>云印章（证书）管理</h2>
+              <p>修改PIN码、续期、变更</p>
+            </span>
+            <span class="option-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </button>
+
+          <button class="business-card" type="button" data-business="seal">
+            <span class="option-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M8.5 11.5h7l1.3 6H7.2l1.3-6Z" stroke="currentColor" stroke-linejoin="round"/>
+                <path d="M10 11.5V8a2 2 0 1 1 4 0v3.5" stroke="currentColor" stroke-linecap="round"/>
+                <path d="M5 20h14" stroke="currentColor" stroke-linecap="round"/>
+                <path d="M8 4.5c.9-1 2.25-1.5 4-1.5s3.1.5 4 1.5" stroke="currentColor" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span>
+              <h2>申请企业印章（证书）</h2>
+              <p>扫码办理云印章（证书）申请</p>
+            </span>
+            <span class="option-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </button>
+        </section>
+      </div>
     </div>
   </main>
 
-  <div class="entry-overlay is-open" id="entryOverlay" role="dialog" aria-modal="true" aria-labelledby="entryTitle">
+  <main class="seal-full-page" id="sealPage" aria-label="业务办理详情页面" hidden>
+    <div class="seal-page-shell">
+      <header class="seal-page-header">
+        <div class="seal-page-title-group">
+          <h1 class="seal-page-title" id="processTitle">申请企业印章（证书）</h1>
+          <div class="seal-page-company" aria-label="当前企业">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 21V6.5C4 5.12 5.12 4 6.5 4h6C13.88 4 15 5.12 15 6.5V21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M15 9h2.5c1.38 0 2.5 1.12 2.5 2.5V21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 8h3M8 12h3M8 16h3M3 21h18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            成都房联云码
+          </div>
+        </div>
+        <button class="back-btn" type="button" id="backToEntryTop">返回</button>
+      </header>
+
+      <div class="seal-page-body">
+        <div class="modal-grid">
+          <section class="info-panel">
+            <h2 class="section-heading" id="sealInfoHeading">企业信息</h2>
+            <div class="section-rule"></div>
+            <dl class="info-list" id="sealInfoList"></dl>
+            <div class="tips-box">
+              <div class="tips-title">
+                <span class="tips-icon">i</span>
+                温馨提示
+              </div>
+              <ul id="sealTipsList"></ul>
+            </div>
+          </section>
+
+          <section class="qr-panel">
+            <h2 class="qr-title" id="sealQrTitle">扫码办理云印章（证书）</h2>
+            <div class="qr-frame">
+              <canvas id="sealQrCanvas" width="306" height="306" aria-label="业务办理二维码"></canvas>
+            </div>
+            <div class="qr-expire">二维码有效期： <span id="sealTimerText">09:55</span></div>
+            <button class="refresh-btn" type="button" id="sealRefreshBtn">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20 12a8 8 0 1 1-2.34-5.66" stroke="currentColor" stroke-linecap="round"/>
+                <path d="M20 4v5h-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              刷新二维码
+            </button>
+          </section>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <div class="entry-overlay" id="entryOverlay" role="dialog" aria-modal="true" aria-labelledby="entryTitle">
     <div class="entry-modal">
       <header class="entry-header">
         <div class="entry-title-group">
@@ -1024,6 +1325,8 @@
       }
     };
 
+    const hostPage = document.getElementById("hostPage");
+    const sealPage = document.getElementById("sealPage");
     const entryOverlay = document.getElementById("entryOverlay");
     const overlay = document.getElementById("sdkOverlay");
     const modalTitle = document.getElementById("modalTitle");
@@ -1034,14 +1337,27 @@
     const timerText = document.getElementById("timerText");
     const qrCanvas = document.getElementById("qrCanvas");
     const refreshBtn = document.getElementById("refreshBtn");
+    const processTitle = document.getElementById("processTitle");
+    const sealInfoHeading = document.getElementById("sealInfoHeading");
+    const sealQrTitle = document.getElementById("sealQrTitle");
+    const sealInfoList = document.getElementById("sealInfoList");
+    const sealTipsList = document.getElementById("sealTipsList");
+    const sealTimerText = document.getElementById("sealTimerText");
+    const sealQrCanvas = document.getElementById("sealQrCanvas");
+    const sealRefreshBtn = document.getElementById("sealRefreshBtn");
     let activeBusiness = "seal";
     let remainingSeconds = 595;
     let timerId = null;
     let refreshIndex = 0;
 
     function openEntry() {
-      entryOverlay.classList.add("is-open");
-      document.body.classList.add("modal-open");
+      clearInterval(timerId);
+      hostPage.classList.remove("is-hidden");
+      sealPage.hidden = true;
+      entryOverlay.classList.remove("is-open");
+      overlay.classList.remove("is-open");
+      document.body.classList.remove("modal-open");
+      window.scrollTo({ top: 0, behavior: "auto" });
     }
 
     function closeEntry() {
@@ -1051,8 +1367,8 @@
       }
     }
 
-    function createInfoRows(rows) {
-      infoList.innerHTML = "";
+    function createInfoRows(rows, targetList = infoList) {
+      targetList.innerHTML = "";
       rows.forEach(([label, value]) => {
         const wrapper = document.createElement("div");
         wrapper.className = "info-row";
@@ -1076,16 +1392,16 @@
           detail.textContent = value;
         }
         wrapper.appendChild(detail);
-        infoList.appendChild(wrapper);
+        targetList.appendChild(wrapper);
       });
     }
 
-    function createTips(tips) {
-      tipsList.innerHTML = "";
+    function createTips(tips, targetList = tipsList) {
+      targetList.innerHTML = "";
       tips.forEach((tip) => {
         const item = document.createElement("li");
         item.textContent = tip;
-        tipsList.appendChild(item);
+        targetList.appendChild(item);
       });
     }
 
@@ -1124,9 +1440,9 @@
       ctx.fillRect(x + cell * 2, y + cell * 2, cell * 3, cell * 3);
     }
 
-    function drawQr(seed) {
-      const ctx = qrCanvas.getContext("2d");
-      const width = qrCanvas.width;
+    function drawQr(seed, targetCanvas = qrCanvas) {
+      const ctx = targetCanvas.getContext("2d");
+      const width = targetCanvas.width;
       const size = 31;
       const quiet = 3;
       const cell = Math.floor(width / (size + quiet * 2));
@@ -1161,13 +1477,13 @@
       return `${minutes}:${rest}`;
     }
 
-    function startTimer() {
+    function startTimer(targetTimer = timerText) {
       clearInterval(timerId);
       remainingSeconds = 595;
-      timerText.textContent = formatTime(remainingSeconds);
+      targetTimer.textContent = formatTime(remainingSeconds);
       timerId = setInterval(() => {
         remainingSeconds = Math.max(0, remainingSeconds - 1);
-        timerText.textContent = formatTime(remainingSeconds);
+        targetTimer.textContent = formatTime(remainingSeconds);
         if (remainingSeconds === 0) {
           clearInterval(timerId);
         }
@@ -1175,18 +1491,28 @@
     }
 
     function openModal(type) {
+      openProcessPage(type);
+    }
+
+    function openProcessPage(type) {
       const config = businessConfig[type];
+      if (!config) return;
+
       activeBusiness = type;
       closeEntry();
-      modalTitle.textContent = config.title;
-      infoHeading.textContent = config.infoHeading;
-      qrTitle.textContent = config.qrTitle;
-      createInfoRows(config.rows);
-      createTips(config.tips);
-      drawQr(`${config.seed}-${refreshIndex}`);
-      startTimer();
-      overlay.classList.add("is-open");
-      document.body.classList.add("modal-open");
+      overlay.classList.remove("is-open");
+      hostPage.classList.add("is-hidden");
+      sealPage.hidden = false;
+      document.body.classList.remove("modal-open");
+
+      processTitle.textContent = config.title;
+      sealInfoHeading.textContent = config.infoHeading;
+      sealQrTitle.textContent = config.qrTitle;
+      createInfoRows(config.rows, sealInfoList);
+      createTips(config.tips, sealTipsList);
+      drawQr(`${config.seed}-${refreshIndex}`, sealQrCanvas);
+      startTimer(sealTimerText);
+      window.scrollTo({ top: 0, behavior: "auto" });
     }
 
     function closeModal() {
@@ -1197,11 +1523,14 @@
 
     document.querySelectorAll("[data-business]").forEach((button) => {
       button.addEventListener("click", () => {
-        openModal(button.dataset.business);
+        openProcessPage(button.dataset.business);
       });
     });
 
-    document.getElementById("launchEntry").addEventListener("click", openEntry);
+    const launchEntry = document.getElementById("launchEntry");
+    if (launchEntry) {
+      launchEntry.addEventListener("click", openEntry);
+    }
     document.getElementById("entryClose").addEventListener("click", closeEntry);
 
     refreshBtn.addEventListener("click", () => {
@@ -1209,6 +1538,14 @@
       drawQr(`${businessConfig[activeBusiness].seed}-${refreshIndex}`);
       startTimer();
     });
+
+    sealRefreshBtn.addEventListener("click", () => {
+      refreshIndex += 1;
+      drawQr(`${businessConfig[activeBusiness].seed}-${refreshIndex}`, sealQrCanvas);
+      startTimer(sealTimerText);
+    });
+
+    document.getElementById("backToEntryTop").addEventListener("click", openEntry);
 
     document.getElementById("topClose").addEventListener("click", closeModal);
     document.getElementById("bottomClose").addEventListener("click", closeModal);
@@ -1235,7 +1572,9 @@
 
     const presetBusiness = new URLSearchParams(window.location.search).get("business");
     if (businessConfig[presetBusiness]) {
-      window.setTimeout(() => openModal(presetBusiness), 80);
+      window.setTimeout(() => {
+        openProcessPage(presetBusiness);
+      }, 80);
     } else {
       openEntry();
     }
