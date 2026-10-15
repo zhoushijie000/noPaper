@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CA 改造范围说明</title>
+<style>
+:root{font-family:Inter,"Microsoft YaHei","PingFang SC",sans-serif;color:#243248;background:#f5f7fa;font-synthesis:none}*{box-sizing:border-box}body{margin:0}main{max-width:1120px;margin:0 auto;padding:56px 32px 30px}.eyebrow{font-size:14px;letter-spacing:2px;color:#64748b;margin-bottom:14px}header{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:28px}h1{font-size:32px;letter-spacing:-.6px;margin:0 0 12px;color:#15243c}header p{font-size:16px;line-height:1.8;color:#718096;margin:0}button{font:inherit;font-size:15px;border:1px solid #dce2eb;border-radius:7px;padding:10px 16px;background:white;color:#526078;cursor:pointer;white-space:nowrap}button:hover{background:#edf2f8}button:focus-visible{outline:3px solid #90baff;outline-offset:3px}.notice{border-left:3px solid #427bea;background:#edf3fd;padding:15px 19px;font-size:16px;line-height:1.8;margin-bottom:28px;color:#415773}.notice strong{color:#2d5fa8;margin-right:12px}.sheet{background:white;border:1px solid #e2e7ef;border-radius:10px;overflow:hidden}.table-title{padding:21px 24px;display:flex;align-items:baseline;gap:12px;border-bottom:1px solid #e8edf3}.table-title h2{font-size:19px;margin:0;color:#26364f}.table-title span{font-size:14px;color:#8a96a8}table{width:100%;border-collapse:collapse;text-align:left;table-layout:fixed}th{padding:13px 24px;background:#fafbfd;font-size:14px;font-weight:500;color:#8090a5}td{vertical-align:top;border-top:1px solid #edf0f5;padding:20px 24px;font-size:15px;line-height:1.85}th:first-child{width:22%}th:nth-child(2){width:57%}th:last-child{width:21%}.scene{font-size:16px;font-weight:600;color:#24364e;display:block;margin-bottom:7px}.badge{display:inline-block;font-size:13px;font-weight:400;padding:1px 7px;border-radius:4px;line-height:1.8;color:#396cb7;background:#edf3fc}.badge.pause{color:#9a752f;background:#fbf4e6}.badge.same{color:#6c7c8d;background:#f0f3f6}.headline{font-size:16px;font-weight:500;color:#2d3e55;margin-bottom:4px}.detail{color:#7a8799;font-size:14px;line-height:1.9}.detail div+div{margin-top:2px}.business{font-size:14px;color:#65758b;line-height:1.95}.business span{display:block}footer{display:flex;justify-content:space-between;gap:16px;padding:18px 2px;font-size:13px;color:#95a0b0;line-height:1.7}@media print{body{background:white}main{max-width:none;padding:12px}button{display:none}.sheet{border-radius:0}td{padding:13px 18px}th{padding:10px 18px}tr{break-inside:avoid}header{margin-bottom:18px}.notice{margin-bottom:18px}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+.test-focus{margin-top:24px;background:#fff;border:1px solid #e2e7ef;border-radius:10px;overflow:hidden}
+.test-items{display:grid;grid-template-columns:1fr 1fr;gap:28px;padding:24px}
+.test-item h3{font-size:16px;color:#2d3e55;margin:0 0 9px}
+.test-item p{font-size:15px;line-height:1.9;color:#65758b;margin:0}
+.test-item + .test-item{border-left:1px solid #e8edf3;padding-left:28px}
+
+@media print{.test-focus{break-inside:avoid}}
+
+body{min-width:1200px}
+main{max-width:1440px;padding:40px 48px 32px}
+.eyebrow{font-size:16px}
+h1{font-size:36px;margin:0}
+header{margin-bottom:28px}
+.table-title{padding:22px 28px}
+.table-title h2{font-size:22px}
+.table-title span{font-size:16px}
+th{font-size:16px;padding:16px 28px}
+td{font-size:18px;padding:22px 28px}
+th:first-child{width:20%}th:nth-child(2){width:59%}th:last-child{width:21%}
+.scene,.headline{font-size:18px}
+.detail,.business{font-size:16px}
+.detail.ca-note{color:#d93025}
+.badge{font-size:14px}
+.test-items{padding:26px 28px;gap:32px}
+.test-item h3{font-size:19px}
+.test-item p{font-size:17px}
+footer{font-size:14px}
+@media print{body{min-width:0}main{padding:12px}}
+</style>
+</head>
+<body>
+<main>
+<div class="eyebrow">业务改造说明</div>
+<header><h1>CA 改造范围说明</h1></header>
+<section class="sheet" aria-labelledby="scope-title">
+<div class="table-title"><h2 id="scope-title">改造清单</h2><span>按业务场景说明</span></div>
+<table><thead><tr><th scope="col">改动场景</th><th scope="col">调整说明</th><th scope="col">涉及业务</th></tr></thead><tbody>
+<tr><td><span class="scene">印章申请</span></td><td><div class="headline">由中台提交申请，调整为跳转 CA 页面申请</div><div class="detail"><div>经办人可线上完成，支持法人认证或对公打款验证。</div><div>申请时必须设置 PIN 码，可作为签署验证密码。</div></div></td><td class="business"><span>保租房</span><span>商品房</span></td></tr>
+<tr><td><span class="scene">人员认证</span><span class="badge pause">暂时关闭</span></td><td><div class="headline">暂时关闭人员认证</div></td><td class="business"><span>保租房</span><span>商品房</span></td></tr>
+<tr><td><span class="scene">授权印章</span><span class="badge pause">暂时关闭</span></td><td><div class="headline">暂时关闭授权印章，老印章已授权人员仍可使用</div><div class="detail"><div>新印章在四川 CA 不限制签署人，输入正确的印章 PIN 码即可签署。</div><div>开发企业、保租房企业需在内部沟通共享 PIN 码。</div></div></td><td class="business"><span>保租房</span><span>商品房</span></td></tr>
+<tr><td><span class="scene">企业签章</span><span class="badge">需业务改造</span></td><td><div class="headline">跳转四川 CA 页面签章</div><div class="detail"><div>支持合同预览及查看签署位置。</div><div>业务系统需增加<strong>签署人姓名、签署人手机号</strong>。</div></div></td><td class="business"><span>保租房</span><span>商品房</span></td></tr>
+<tr><td><span class="scene">个人签字</span></td><td><div class="headline">跳转腾讯电子签进行签名</div><div class="detail"><div>支持合同预览及查看签署位置。</div><div>业务系统后续可视情况调整。</div></div></td><td class="business"><span>保租房、商品房</span><span>存量房、租赁、公租房</span></td></tr>
+<tr><td><span class="scene">银行签章</span><span class="badge same">自动签章</span></td><td><div class="headline">老印章模式不变</div><div class="detail">后续新印章申请后，需提供初始 PIN 码。</div></td><td class="business"><span>公租房</span><span>资金监管协议（银行）</span></td></tr>
+<tr><td><span class="scene">网签备案</span><span class="badge same">模式不变</span></td><td><div class="headline">沿用现有网签备案模式</div><div class="detail ca-note">需通过成都市房屋产权交易中心线下或线上渠道申请 CA 证书。</div></td><td class="business"><span>商品房</span><span>存量房</span></td></tr>
+</tbody></table></section>
+<section class="test-focus" aria-labelledby="test-title">
+<div class="table-title"><h2 id="test-title">测试重点</h2></div>
+<div class="test-items">
+<div class="test-item"><h3>01 · 新老合同兼容</h3><p>升级前创建的合同继续走老服务；升级后创建的合同走新服务，两类合同均需验证。</p></div>
+<div class="test-item"><h3>02 · 新老企业覆盖</h3><p>企业测试需同时覆盖已有企业和新增企业，验证两类企业的业务流程。</p></div>
+</div></section>
+<footer><span>本页为改造范围摘要</span></footer>
+</main>
+</body>
+</html>

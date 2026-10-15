@@ -650,6 +650,43 @@
       font-weight: 700;
     }
 
+    .duration-options {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 0 0 12px;
+      padding: 0;
+      border: 0;
+    }
+
+    .duration-options legend {
+      width: 100%;
+      margin-bottom: 12px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .duration-options label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .duration-options label:has(input:checked) {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .duration-options input { accent-color: var(--primary); }
+    #qrStatus { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+    #sealRefreshBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .qr-frame[hidden], .qr-expire[hidden], .duration-options[hidden] { display: none; }
+
     .qr-frame {
       width: 342px;
       height: 342px;
@@ -1054,6 +1091,59 @@
         font-size: 22px;
       }
     }
+    .seal-page-body .info-panel,
+    .seal-page-body .qr-panel { min-height: 0; }
+    .seal-page-body .info-list { margin-bottom: 20px; }
+    .seal-page-body .duration-list { margin-bottom: 0; }
+    .seal-page-body .info-row { align-items: center; }
+    .seal-page-body .business-tag {
+      gap: 6px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text-strong);
+      font-size: 16px;
+      font-weight: 400;
+      cursor: pointer;
+    }
+    .seal-page-body .business-tag:has(input:checked) {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+    .seal-page-body .business-tag input { accent-color: var(--primary); }
+    .seal-page-body .duration-options { justify-content: flex-start; flex-wrap: wrap; margin: 0; font-size: 16px; }
+    #durationRow[hidden], #qrStatus[hidden] { display: none; }
+    .seal-page-body .info-row dd { overflow-wrap: anywhere; }
+    #sealQrFrame { position: relative; background: #fafcff; }
+    #sealQrFrame[data-state="ready"] { background: #fff; }
+    #sealQrCanvas[hidden], #sealRefreshBtn[hidden] { display: none; }
+    #sealQrFrame #qrStatus { max-width: 230px; margin: 0; padding: 20px; }
+    #qrStatus::before {
+      content: "";
+      display: block;
+      width: 32px;
+      height: 32px;
+      margin: 0 auto 18px;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      background: linear-gradient(#e2e8f0, #e2e8f0) center / 14px 2px no-repeat;
+    }
+    #sealQrFrame[data-state="loading"] #qrStatus::before {
+      border-color: #dbeafe;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      background: none;
+      animation: qr-spin 0.8s linear infinite;
+    }
+    #sealQrFrame[data-state="ready"] canvas { animation: qr-appear 0.2s ease-out; }
+    @keyframes qr-spin { to { transform: rotate(360deg); } }
+    @keyframes qr-appear { from { opacity: 0; } to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) {
+      #sealQrFrame[data-state="loading"] #qrStatus::before,
+      #sealQrFrame[data-state="ready"] canvas { animation: none; }
+    }
   </style>
 </head>
 <body>
@@ -1123,14 +1213,6 @@
       <header class="seal-page-header">
         <div class="seal-page-title-group">
           <h1 class="seal-page-title" id="processTitle">申请企业印章（证书）</h1>
-          <div class="seal-page-company" aria-label="当前企业">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M4 21V6.5C4 5.12 5.12 4 6.5 4h6C13.88 4 15 5.12 15 6.5V21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M15 9h2.5c1.38 0 2.5 1.12 2.5 2.5V21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M8 8h3M8 12h3M8 16h3M3 21h18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            成都房联云码
-          </div>
         </div>
         <button class="back-btn" type="button" id="backToEntryTop">返回</button>
       </header>
@@ -1141,19 +1223,24 @@
             <h2 class="section-heading" id="sealInfoHeading">企业信息</h2>
             <div class="section-rule"></div>
             <dl class="info-list" id="sealInfoList"></dl>
-            <div class="tips-box">
-              <div class="tips-title">
-                <span class="tips-icon">i</span>
-                温馨提示
+            <dl class="info-list duration-list">
+              <div class="info-row" id="durationRow">
+                <dt id="durationLabel">申请时间</dt>
+                <dd>
+                  <fieldset class="duration-options" id="durationOptions" aria-labelledby="durationLabel">
+                    <label><input type="radio" name="durationYears" value="1">1年</label>
+                    <label><input type="radio" name="durationYears" value="2">2年</label>
+                    <label><input type="radio" name="durationYears" value="4">4年</label>
+                  </fieldset>
+                </dd>
               </div>
-              <ul id="sealTipsList"></ul>
-            </div>
+            </dl>
           </section>
 
           <section class="qr-panel">
-            <h2 class="qr-title" id="sealQrTitle">扫码办理云印章（证书）</h2>
-            <div class="qr-frame">
-              <canvas id="sealQrCanvas" width="306" height="306" aria-label="业务办理二维码"></canvas>
+            <div class="qr-frame" id="sealQrFrame" data-state="waiting">
+              <p id="qrStatus" role="status">选择申请时间后，二维码将自动生成</p>
+              <canvas id="sealQrCanvas" width="306" height="306" aria-label="业务办理二维码" hidden></canvas>
             </div>
             <div class="qr-expire">二维码有效期： <span id="sealTimerText">09:55</span></div>
             <button class="refresh-btn" type="button" id="sealRefreshBtn">
@@ -1299,10 +1386,10 @@
           ["企业名称", "成都房联云码"],
           ["统一社会信用代码", "91510100MA61Y5PR1Q"],
           ["法定代表人", "张三"],
-          ["管理事项", ["修改PIN码", "证书续期", "信息变更"]]
+          ["办理业务", ["修改PIN码", "证书续期", "信息变更"]]
         ],
         tips: [
-          "请使用法定代表人或经办人微信扫描右侧二维码进入手机端云印章（证书）管理；",
+          "请使用法定代表人或经办人微信扫描下方二维码进入手机端云印章（证书）管理；",
           "手机端可完成修改PIN码、续期、变更等操作；",
           "办理结果将自动同步到业务系统，请耐心等待。"
         ]
@@ -1318,7 +1405,7 @@
           ["法定代表人", "张三"]
         ],
         tips: [
-          "请使用法定代表人或经办人微信扫描右侧二维码办理云印章（证书）；",
+          "请使用法定代表人或经办人微信扫描下方二维码办理云印章（证书）；",
           "办理过程中需完成实名认证、人脸识别等操作；",
           "办理结果将自动同步到业务系统，请耐心等待。"
         ]
@@ -1339,19 +1426,89 @@
     const refreshBtn = document.getElementById("refreshBtn");
     const processTitle = document.getElementById("processTitle");
     const sealInfoHeading = document.getElementById("sealInfoHeading");
-    const sealQrTitle = document.getElementById("sealQrTitle");
     const sealInfoList = document.getElementById("sealInfoList");
-    const sealTipsList = document.getElementById("sealTipsList");
     const sealTimerText = document.getElementById("sealTimerText");
     const sealQrCanvas = document.getElementById("sealQrCanvas");
+    const sealQrFrame = document.getElementById("sealQrFrame");
     const sealRefreshBtn = document.getElementById("sealRefreshBtn");
     let activeBusiness = "seal";
     let remainingSeconds = 595;
     let timerId = null;
+    let qrGenerationId = null;
     let refreshIndex = 0;
+    let selectedYears = null;
+    let selectedManagement = null;
+    const durationLabel = document.getElementById("durationLabel");
+    const durationOptions = document.getElementById("durationOptions");
+    const durationRow = document.getElementById("durationRow");
+    const qrStatus = document.getElementById("qrStatus");
+
+    function needsDuration() {
+      return activeBusiness === "seal" || selectedManagement === "证书续期";
+    }
+
+    function resetDurationQr() {
+      clearInterval(timerId);
+      clearTimeout(qrGenerationId);
+      sealQrFrame.dataset.state = "waiting";
+      sealQrFrame.setAttribute("aria-busy", "false");
+      sealQrCanvas.hidden = true;
+      sealTimerText.parentElement.hidden = true;
+      sealQrCanvas.getContext("2d").clearRect(0, 0, sealQrCanvas.width, sealQrCanvas.height);
+      delete sealQrCanvas.dataset.durationYears;
+      delete sealQrCanvas.dataset.management;
+      durationRow.hidden = !needsDuration();
+      durationOptions.disabled = !needsDuration();
+      sealRefreshBtn.hidden = true;
+      qrStatus.hidden = false;
+      qrStatus.textContent = activeBusiness === "cert" && !selectedManagement
+        ? "选择办理业务后，二维码将自动生成"
+        : `选择${durationLabel.textContent}后，二维码将自动生成`;
+      generateSelectedQr();
+    }
+
+    function generateSelectedQr() {
+      if (activeBusiness === "cert" && !selectedManagement) return;
+      if (needsDuration() && ![1, 2, 4].includes(selectedYears)) return;
+      clearTimeout(qrGenerationId);
+      clearInterval(timerId);
+      sealQrCanvas.hidden = true;
+      sealTimerText.parentElement.hidden = true;
+      sealQrFrame.dataset.state = "loading";
+      sealQrFrame.setAttribute("aria-busy", "true");
+      qrStatus.hidden = false;
+      qrStatus.textContent = "正在准备二维码…";
+      sealRefreshBtn.disabled = true;
+      // Prototype loading feedback; discard pending work whenever the selection changes.
+      qrGenerationId = window.setTimeout(() => {
+        refreshIndex += 1;
+        const durationSeed = needsDuration() ? `-${selectedYears}years` : "";
+        drawQr(`${businessConfig[activeBusiness].seed}-${selectedManagement || "apply"}${durationSeed}-${refreshIndex}`, sealQrCanvas);
+        if (needsDuration()) sealQrCanvas.dataset.durationYears = String(selectedYears);
+        else delete sealQrCanvas.dataset.durationYears;
+        if (selectedManagement) sealQrCanvas.dataset.management = selectedManagement;
+        else delete sealQrCanvas.dataset.management;
+        sealQrFrame.dataset.state = "ready";
+        sealQrFrame.setAttribute("aria-busy", "false");
+        sealQrCanvas.hidden = false;
+        sealTimerText.parentElement.hidden = false;
+        sealRefreshBtn.hidden = false;
+        sealRefreshBtn.disabled = false;
+        qrStatus.hidden = true;
+        startTimer(sealTimerText);
+      }, 350);
+    }
+
+    document.querySelectorAll('input[name="durationYears"]').forEach((input) => {
+      input.addEventListener("change", () => {
+        selectedYears = Number(input.value);
+        resetDurationQr();
+      });
+    });
 
     function openEntry() {
       clearInterval(timerId);
+      clearTimeout(qrGenerationId);
       hostPage.classList.remove("is-hidden");
       sealPage.hidden = true;
       entryOverlay.classList.remove("is-open");
@@ -1382,11 +1539,28 @@
           const tags = document.createElement("div");
           tags.className = "business-tags";
           value.forEach((item) => {
-            const tag = document.createElement("span");
+            const selectable = activeBusiness === "cert" && targetList === sealInfoList;
+            const tag = document.createElement(selectable ? "label" : "span");
             tag.className = "business-tag";
-            tag.textContent = item;
+            if (selectable) {
+              const input = document.createElement("input");
+              input.type = "radio";
+              input.name = "managementBusiness";
+              input.value = item;
+              input.addEventListener("change", () => {
+                selectedManagement = item;
+                selectedYears = null;
+                document.querySelectorAll('input[name="durationYears"]').forEach((radio) => { radio.checked = false; });
+                resetDurationQr();
+              });
+              tag.append(input, document.createTextNode(item));
+            } else {
+              tag.textContent = item;
+            }
             tags.appendChild(tag);
           });
+          tags.setAttribute("role", "radiogroup");
+          tags.setAttribute("aria-label", label);
           detail.appendChild(tags);
         } else {
           detail.textContent = value;
@@ -1486,6 +1660,13 @@
         targetTimer.textContent = formatTime(remainingSeconds);
         if (remainingSeconds === 0) {
           clearInterval(timerId);
+          if (targetTimer === sealTimerText) {
+            sealQrCanvas.hidden = true;
+            sealQrFrame.dataset.state = "expired";
+            sealTimerText.parentElement.hidden = true;
+            qrStatus.hidden = false;
+            qrStatus.textContent = "二维码已过期，请点击下方刷新";
+          }
         }
       }, 1000);
     }
@@ -1507,11 +1688,12 @@
 
       processTitle.textContent = config.title;
       sealInfoHeading.textContent = config.infoHeading;
-      sealQrTitle.textContent = config.qrTitle;
       createInfoRows(config.rows, sealInfoList);
-      createTips(config.tips, sealTipsList);
-      drawQr(`${config.seed}-${refreshIndex}`, sealQrCanvas);
-      startTimer(sealTimerText);
+      selectedYears = null;
+      selectedManagement = null;
+      durationLabel.textContent = type === "seal" ? "申请时间" : "续期时间";
+      document.querySelectorAll('input[name="durationYears"]').forEach((input) => { input.checked = false; });
+      resetDurationQr();
       window.scrollTo({ top: 0, behavior: "auto" });
     }
 
@@ -1539,11 +1721,7 @@
       startTimer();
     });
 
-    sealRefreshBtn.addEventListener("click", () => {
-      refreshIndex += 1;
-      drawQr(`${businessConfig[activeBusiness].seed}-${refreshIndex}`, sealQrCanvas);
-      startTimer(sealTimerText);
-    });
+    sealRefreshBtn.addEventListener("click", generateSelectedQr);
 
     document.getElementById("backToEntryTop").addEventListener("click", openEntry);
 
