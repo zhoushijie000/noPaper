@@ -83,7 +83,6 @@ dialog footer { display: flex; gap: 12px; justify-content: flex-end; margin-top:
 .organization-name { display: block; color: #253b59; font-size: 16px; font-weight: 600; line-height: 1.6 }
 .organization-code-label { display: block; margin-top: 10px; color: #8995a6; font-size: 12px }
 .organization-code { display: block; margin-top: 2px; color: #67778d; font-size: 14px; letter-spacing: .4px; overflow-wrap: anywhere }
-.current-organization { padding: 13px 18px; background: #edf5ff; color: #2c5f9c; font-size: 14px; overflow-wrap: anywhere }
 </style>
 </head>
 <body>
@@ -116,7 +115,6 @@ dialog footer { display: flex; gap: 12px; justify-content: flex-end; margin-top:
 </section>
 <section id="list" aria-label="我的合同" hidden>
 <header class="list-header"><button class="back" id="back">‹ 返回</button><h1 id="listTitle">我的合同</h1></header>
-<p class="current-organization" id="currentOrganization" hidden></p>
 <nav aria-label="合同状态"><button data-filter="全部" aria-pressed="true"><span id="all"></span></button><button data-filter="待签署" aria-pressed="false">待签署</button><button data-filter="已签署" aria-pressed="false">已签署</button></nav>
 <div id="cards"></div>
 <button class="batch" id="batch"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-3M9 16l1-4 8-8 3 3-8 8-4 1Z"/></svg>批量签署</button>
@@ -228,8 +226,6 @@ function navigate() {
     contracts = contractLists[key];
     filter = '全部';
     el('listTitle').textContent = modes[mode] + '合同';
-    el('currentOrganization').hidden = !activeOrganization;
-    el('currentOrganization').textContent = activeOrganization?.name || '';
     el('approve').textContent = '模拟' + modes[mode];
     render();
   }
