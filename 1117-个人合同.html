@@ -74,19 +74,15 @@ dialog footer { display: flex; gap: 12px; justify-content: flex-end; margin-top:
 #choices { max-height: 40dvh; overflow: auto }
 
 #organizations { min-height: 100dvh; background: #f5f8fc }
-.organization-content { padding: 24px 20px 120px }
+.organization-content { padding: 24px 20px 32px }
 .organization-intro { margin: 0 0 20px; color: #74859c; font-size: 14px }
 .organization-options { display: grid; gap: 14px; border: 0; margin: 0; padding: 0; min-width: 0 }
-.organization-option { display: flex; align-items: center; gap: 14px; padding: 20px 16px; border: 1px solid #e1e8f2; border-radius: 14px; background: white; cursor: pointer }
-.organization-option:has(input:checked) { background: #edf5ff; border-color: #3884e9; box-shadow: 0 4px 16px #2362a30a }
-.organization-option input { margin: 0; width: 19px; height: 19px; flex: 0 0 19px; accent-color: #2879df }
+.organization-option { display: flex; align-items: center; gap: 14px; padding: 20px 16px; border: 1px solid #e1e8f2; border-radius: 14px; background: white; cursor: pointer; width: 100%; text-align: left }
+.organization-option:hover { background: #edf5ff; border-color: #3884e9; box-shadow: 0 4px 16px #2362a30a }
 .organization-details { min-width: 0 }
 .organization-name { display: block; color: #253b59; font-size: 16px; font-weight: 600; line-height: 1.6 }
 .organization-code-label { display: block; margin-top: 10px; color: #8995a6; font-size: 12px }
 .organization-code { display: block; margin-top: 2px; color: #67778d; font-size: 14px; letter-spacing: .4px; overflow-wrap: anywhere }
-.organization-footer { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100%,480px); padding: 16px 20px calc(16px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid #edf0f5 }
-.organization-footer .primary { width: 100%; min-height: 48px; border-radius: 10px }
-.primary:disabled { background: #b9cde6; cursor: not-allowed }
 .current-organization { padding: 13px 18px; background: #edf5ff; color: #2c5f9c; font-size: 14px; overflow-wrap: anywhere }
 </style>
 </head>
@@ -111,13 +107,12 @@ dialog footer { display: flex; gap: 12px; justify-content: flex-end; margin-top:
 </section>
 <section id="organizations" aria-labelledby="organizationsTitle" hidden>
 <header class="list-header"><button class="back" id="organizationBack">‹ 返回</button><h1 id="organizationsTitle">选择签章机构</h1></header>
-<form id="organizationForm">
+
 <div class="organization-content">
-<p class="organization-intro" id="organizationHint">请选择本次签章使用的机构，并确认机构信息。</p>
-<div class="organization-options" id="organizationOptions" role="radiogroup" aria-labelledby="organizationsTitle" aria-describedby="organizationHint"></div>
+<p class="organization-intro" id="organizationHint">请选择本次签章使用的机构。</p>
+<div class="organization-options" id="organizationOptions" aria-labelledby="organizationsTitle" aria-describedby="organizationHint"></div>
 </div>
-<div class="organization-footer"><button class="primary" id="confirmOrganization" disabled>确认机构，进入合同列表</button></div>
-</form>
+
 </section>
 <section id="list" aria-label="我的合同" hidden>
 <header class="list-header"><button class="back" id="back">‹ 返回</button><h1 id="listTitle">我的合同</h1></header>
@@ -142,7 +137,6 @@ const organizations = [
 ];
 const contractLists = {};
 let activeOrganization = null;
-let selectedOrganizationId = '';
 let mode = '', contracts = [], filter = '全部', selected = new Set();
 function node(tag, css, value) {
   const item = document.createElement(tag);
@@ -194,26 +188,21 @@ function createContracts(organization) {
 }
 function renderOrganizations() {
   el('organizationOptions').replaceChildren(...organizations.map(organization => {
-    const label = node('label','organization-option','');
-    const input = document.createElement('input');
-    input.type = 'radio';
-    input.name = 'organization';
-    input.value = organization.id;
-    input.required = true;
-    input.checked = organization.id === selectedOrganizationId;
+    const button = node('button','organization-option','');
+    button.type = 'button';
+    button.onclick = () => { location.hash = 'seal/' + organization.id; };
     const details = node('span','organization-details','');
     details.append(
       node('span','organization-name',organization.name),
       node('span','organization-code-label','统一社会信用代码'),
       node('span','organization-code',organization.creditCode)
     );
-    label.append(input,details);
-    return label;
+    button.append(details);
+    return button;
   }));
   el('organizationHint').textContent = organizations.length
-    ? '请选择本次签章使用的机构，并确认机构信息。'
+    ? '请选择本次签章使用的机构。'
     : '暂无可用的签章机构';
-  el('confirmOrganization').disabled = !organizations.some(item => item.id === selectedOrganizationId);
 }
 function navigate() {
   const [route, organizationId] = location.hash.slice(1).split('/');
@@ -249,15 +238,6 @@ function navigate() {
 document.querySelectorAll('[data-mode]').forEach(button => {
   button.onclick = () => { location.hash = button.dataset.mode; };
 });
-el('organizationOptions').onchange = event => {
-  selectedOrganizationId = event.target.value;
-  el('confirmOrganization').disabled = !organizations.some(item => item.id === selectedOrganizationId);
-};
-el('organizationForm').onsubmit = event => {
-  event.preventDefault();
-  const organization = organizations.find(item => item.id === selectedOrganizationId);
-  if (organization) location.hash = 'seal/' + organization.id;
-};
 el('organizationBack').onclick = () => { location.hash = ''; };
 el('back').onclick = () => { location.hash = mode === 'seal' && organizations.length > 1 ? 'seal' : ''; };
 window.addEventListener('hashchange',navigate);
