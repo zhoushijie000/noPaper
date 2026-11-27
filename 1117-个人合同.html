@@ -72,6 +72,22 @@ dialog p { color: #666; font-size: 14px; margin: 10px 0 }
 dialog footer { display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px }
 .choice { display: flex; gap: 8px; align-items: center; padding: 8px 0; font-size: 13px }
 #choices { max-height: 40dvh; overflow: auto }
+
+#organizations { min-height: 100dvh; background: #f5f8fc }
+.organization-content { padding: 24px 20px 120px }
+.organization-intro { margin: 0 0 20px; color: #74859c; font-size: 14px }
+.organization-options { display: grid; gap: 14px; border: 0; margin: 0; padding: 0; min-width: 0 }
+.organization-option { display: flex; align-items: center; gap: 14px; padding: 20px 16px; border: 1px solid #e1e8f2; border-radius: 14px; background: white; cursor: pointer }
+.organization-option:has(input:checked) { background: #edf5ff; border-color: #3884e9; box-shadow: 0 4px 16px #2362a30a }
+.organization-option input { margin: 0; width: 19px; height: 19px; flex: 0 0 19px; accent-color: #2879df }
+.organization-details { min-width: 0 }
+.organization-name { display: block; color: #253b59; font-size: 16px; font-weight: 600; line-height: 1.6 }
+.organization-code-label { display: block; margin-top: 10px; color: #8995a6; font-size: 12px }
+.organization-code { display: block; margin-top: 2px; color: #67778d; font-size: 14px; letter-spacing: .4px; overflow-wrap: anywhere }
+.organization-footer { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100%,480px); padding: 16px 20px calc(16px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid #edf0f5 }
+.organization-footer .primary { width: 100%; min-height: 48px; border-radius: 10px }
+.primary:disabled { background: #b9cde6; cursor: not-allowed }
+.current-organization { padding: 13px 18px; background: #edf5ff; color: #2c5f9c; font-size: 14px; overflow-wrap: anywhere }
 </style>
 </head>
 <body>
@@ -93,8 +109,19 @@ dialog footer { display: flex; gap: 12px; justify-content: flex-end; margin-top:
 </button>
 </div>
 </section>
+<section id="organizations" aria-labelledby="organizationsTitle" hidden>
+<header class="list-header"><button class="back" id="organizationBack">‹ 返回</button><h1 id="organizationsTitle">选择签章机构</h1></header>
+<form id="organizationForm">
+<div class="organization-content">
+<p class="organization-intro" id="organizationHint">请选择本次签章使用的机构，并确认机构信息。</p>
+<div class="organization-options" id="organizationOptions" role="radiogroup" aria-labelledby="organizationsTitle" aria-describedby="organizationHint"></div>
+</div>
+<div class="organization-footer"><button class="primary" id="confirmOrganization" disabled>确认机构，进入合同列表</button></div>
+</form>
+</section>
 <section id="list" aria-label="我的合同" hidden>
 <header class="list-header"><button class="back" id="back">‹ 返回</button><h1 id="listTitle">我的合同</h1></header>
+<p class="current-organization" id="currentOrganization" hidden></p>
 <nav aria-label="合同状态"><button data-filter="全部" aria-pressed="true"><span id="all"></span></button><button data-filter="待签署" aria-pressed="false">待签署</button><button data-filter="已签署" aria-pressed="false">已签署</button></nav>
 <div id="cards"></div>
 <button class="batch" id="batch"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-3M9 16l1-4 8-8 3 3-8 8-4 1Z"/></svg>批量签署</button>
@@ -107,7 +134,15 @@ const firstNumbers = ['2122208670441861121','2122205383076409346','2122205181129
 const pending = '待签署', signed = '已签署';
 const owner = '周世杰';
 const modes = { signature: '签名', seal: '签章' };
+// Demo organizations. Replace this array with the current user's authorized organizations.
+const organizations = [
+  { id: 'qinghe', name: '成都市青禾村股份经济合作联合社（示例）', creditCode: 'N2510115MF0000012A' },
+  { id: 'fengnian', name: '成都市丰年村股份经济合作联合社（示例）', creditCode: 'N2510116MF0000023B' },
+  { id: 'xingnong', name: '成都市兴农村股份经济合作联合社（示例）', creditCode: 'N2510117MF0000034C' }
+];
 const contractLists = {};
+let activeOrganization = null;
+let selectedOrganizationId = '';
 let mode = '', contracts = [], filter = '全部', selected = new Set();
 function node(tag, css, value) {
   const item = document.createElement(tag);
@@ -121,16 +156,17 @@ function party(name, status) {
   return row;
 }
 function card(contract) {
+  const signer = activeOrganization?.name || owner;
   const box = document.createElement('article');
   const meta = node('div','row meta','');
   meta.append(node('span','number','电子合同号: ' + contract.number),node('span','badge' + (contract.status === signed ? ' done' : ''), contract.status));
   const by = node('p','by','发起方');
-  by.append(node('span','',owner));
+  by.append(node('span','',signer));
   const people = node('div','people','');
-  people.append(party(owner,contract.status),party('系统测试0712_四川CA测试签署方',contract.partner));
+  people.append(party(signer,contract.status),party('系统测试0712_四川CA测试签署方',contract.partner));
   const action = node('button','action',contract.status === pending ? '签约' : '查看');
   action.onclick = () => {
-    showPanel('存量房测试合同','电子合同号 ' + contract.number + '。' + modes[mode] + '人 ' + owner + '（' + contract.status + '）。此为演示合同。');
+    showPanel('存量房测试合同','电子合同号 ' + contract.number + '。' + modes[mode] + '方 ' + signer + '（' + contract.status + '）。此为演示合同。');
     if (contract.status === pending) {
       selected.add(contract.number);
       el('approve').hidden = false;
@@ -147,26 +183,64 @@ function render() {
   if (!visible.length) el('cards').append(node('p','meta','暂无' + filter + '合同'));
   el('batch').hidden = filter === signed || !contracts.some(c => c.status === pending);
 }
-function createContracts() {
+function createContracts(organization) {
   return Array.from({length:123},(_,i) => ({
-    number: firstNumbers[i] || '212220518112906' + String(3500+i),
+    number: organization
+      ? String(3122208670441861121n + BigInt(organizations.indexOf(organization)) * 100000n + BigInt(i))
+      : firstNumbers[i] || '212220518112906' + String(3500+i),
     status: i % 5 === 4 ? signed : pending,
     partner: i % 5 === 4 ? signed : pending
   }));
 }
+function renderOrganizations() {
+  el('organizationOptions').replaceChildren(...organizations.map(organization => {
+    const label = node('label','organization-option','');
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'organization';
+    input.value = organization.id;
+    input.required = true;
+    input.checked = organization.id === selectedOrganizationId;
+    const details = node('span','organization-details','');
+    details.append(
+      node('span','organization-name',organization.name),
+      node('span','organization-code-label','统一社会信用代码'),
+      node('span','organization-code',organization.creditCode)
+    );
+    label.append(input,details);
+    return label;
+  }));
+  el('organizationHint').textContent = organizations.length
+    ? '请选择本次签章使用的机构，并确认机构信息。'
+    : '暂无可用的签章机构';
+  el('confirmOrganization').disabled = !organizations.some(item => item.id === selectedOrganizationId);
+}
 function navigate() {
-  mode = location.hash.slice(1);
-  const open = Object.hasOwn(modes, mode);
+  const [route, organizationId] = location.hash.slice(1).split('/');
+  mode = route;
+  activeOrganization = mode === 'seal' ? organizations.find(item => item.id === organizationId) || null : null;
+  if (mode === 'seal' && !activeOrganization && organizations.length === 1) {
+    history.replaceState(null,'','#seal/' + organizations[0].id);
+    navigate();
+    return;
+  }
+  const choosingOrganization = mode === 'seal' && !activeOrganization;
+  const open = mode === 'signature' || (mode === 'seal' && !!activeOrganization);
   el('panel').close();
   selected.clear();
-  el('entry').hidden = open;
+  el('entry').hidden = open || choosingOrganization;
+  el('organizations').hidden = !choosingOrganization;
   el('list').hidden = !open;
-  document.title = (open ? modes[mode] + '合同' : '选择签署方式') + ' · 无纸化办公';
+  document.title = (choosingOrganization ? '选择签章机构' : open ? modes[mode] + '合同' : '选择签署方式') + ' · 无纸化办公';
+  if (choosingOrganization) renderOrganizations();
   if (open) {
-    contractLists[mode] ??= createContracts();
-    contracts = contractLists[mode];
+    const key = activeOrganization ? 'seal/' + activeOrganization.id : mode;
+    contractLists[key] ??= createContracts(activeOrganization);
+    contracts = contractLists[key];
     filter = '全部';
     el('listTitle').textContent = modes[mode] + '合同';
+    el('currentOrganization').hidden = !activeOrganization;
+    el('currentOrganization').textContent = activeOrganization?.name || '';
     el('approve').textContent = '模拟' + modes[mode];
     render();
   }
@@ -175,7 +249,17 @@ function navigate() {
 document.querySelectorAll('[data-mode]').forEach(button => {
   button.onclick = () => { location.hash = button.dataset.mode; };
 });
-el('back').onclick = () => { location.hash = ''; };
+el('organizationOptions').onchange = event => {
+  selectedOrganizationId = event.target.value;
+  el('confirmOrganization').disabled = !organizations.some(item => item.id === selectedOrganizationId);
+};
+el('organizationForm').onsubmit = event => {
+  event.preventDefault();
+  const organization = organizations.find(item => item.id === selectedOrganizationId);
+  if (organization) location.hash = 'seal/' + organization.id;
+};
+el('organizationBack').onclick = () => { location.hash = ''; };
+el('back').onclick = () => { location.hash = mode === 'seal' && organizations.length > 1 ? 'seal' : ''; };
 window.addEventListener('hashchange',navigate);
 document.querySelector('nav').onclick = e => {
   const tab = e.target.closest('[data-filter]');
